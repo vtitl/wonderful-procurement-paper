@@ -1,0 +1,38 @@
+# Data
+data/raw/
+data/processed/
+
+# macOS
+.DS_Store
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.synctex(busy)
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+*.nav
+*.snm
+*.vrb
+*.dvi
+*.ps
+*.idx
+*.ind
+*.ilg
+*.glo
+*.gls
+*.glg
+*.xdy
+*.acn
+*.acr
+*.alg
+*.ist

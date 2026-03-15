@@ -1,0 +1,548 @@
+\documentclass{beamer}
+\usetheme[faculty=science, university=uu, logo=uu-logo]{fibeamer}
+\usepackage[utf8]{inputenc}
+\usepackage[
+  main=english %% By using `czech` or `slovak` as the main locale
+                %% instead of `english`, you can typeset the
+                %% presentation in either Czech or Slovak,
+                %% respectively.
+                %% The additional keys allow foreign texts to be
+]{babel}        
+
+%% These macros specify information about the presentation
+\title{Replication in Economics} %% that will be typeset on the
+\subtitle{Non-exhaustive tips} %% title page.
+\author{Vita Titl}
+%% These additional packages are used within the document:
+\usepackage{ragged2e}  % `\justifying` text
+\usepackage{booktabs}  % Tables
+\usepackage{tabularx}
+\usepackage{tikz}      % Diagrams
+\usetikzlibrary{calc, shapes, backgrounds, arrows.meta}
+\usepackage{amsmath, amssymb}
+\usepackage{url}       % `\url`s
+\usepackage{listings}  % Code listings
+% ----------------------------------------------------------------
+%  lstlisting style – used for all code boxes in this file
+% ----------------------------------------------------------------
+\lstdefinestyle{repocode}{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{black!88},
+  rulecolor=\color{black!88},
+  frame=single,
+  framesep=4pt,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  breaklines=true,
+  breakatwhitespace=false,
+  keepspaces=true,
+  showstringspaces=false,
+  commentstyle=\color{gray!60},
+  keywordstyle=\color{green!60!white}\bfseries,
+  stringstyle=\color{yellow!80!white},
+  identifierstyle=\color{white},
+  moredelim=[il][\color{cyan!70!white}]{@@},  % highlight marker
+}
+
+% Julia language definition for listings
+\lstdefinelanguage{Julia}{
+  keywords={function, end, if, else, elseif, for, while, return, include, using, import, export, local, const, module},
+  morestring=[b]",
+  morecomment=[l]{\#},
+}
+
+% convenience: inline mono in text
+\newcommand{\code}[1]{\texttt{\small#1}}
+
+
+\frenchspacing
+\begin{document}
+  \frame{\maketitle}
+
+  \AtBeginSection[]{% Print an outline at the beginning of sections
+    \begin{frame}<beamer>
+      \frametitle{Outline  \thesection}
+      \tableofcontents[currentsection]
+    \end{frame}}
+    
+    
+    \begin{frame}{What I Saw and/or Did in the Past}
+    	\begin{itemize}
+		\item Created v12, v13, _final, and then dates and similar
+		\item Copy pasting and manually adjusting tables (e.g., from outreg2)
+		\item Copy pasting findings -- particular numbers -- from tables
+    		\item No comments, no documentation of which file produces what
+    	\end{itemize}		
+	
+	This is easy at first, but gets costly when you need to make adjustment to the code (after getting comments from reviewers) or even worse when you need to submit a replication package.
+    \end{frame}
+
+    \section{Background}
+
+    \begin{frame}{Background}
+      \framesubtitle{Background}%
+      
+      Most top journals in economics (and management) require a replication package (top 5s, most top field journals, Management Science, Marketing Science etc.)
+
+      \bigskip
+      
+      \textbf{Exceptions:} confidential administrative data, proprietary datasets; BUT you may still be required to show replication and you post the codes
+      
+      \bigskip
+      
+      \textbf{Details:} \url{https://aeadataeditor.github.io}
+      
+      \end{frame}
+
+      \begin{frame}{Basic requirements}
+	\begin{itemize}
+      		\item The code you provide processes raw data, runs all the analysis, and replicates every table and/or figure in the paper.
+		\item You should provide a master script that starts the whole process and the user just waits.
+		\item A readme file needs to provided, giving details of how to replicate the paper
+		\begin{itemize}
+			\item The file explains what this replication package does
+			\item The folder structure
+			\item List of figures/tables and which code generates it
+			\item Example config file if needed
+			\item Requirements (yaml file for Conda environment or requirements.txt for python or a list of Stata packages with versions and sources if not ssc)
+			\item Memory and runtime requirement
+		\end{itemize}      
+	\end{itemize}      
+      \end{frame}
+      
+       \begin{frame}{Example config file}
+      \framesubtitle{Background}%
+      
+      It can by config.py with paths needed to run script. For Stata, I recommend to use profile.do, I suggest sth like this:
+      
+      
+
+      \bigskip
+      
+      \textbf{Details:} \url{https://www.stata.com/support/faqs/programming/profile-do-file/}
+      
+      \end{frame}
+
+      
+      \begin{frame}{Example memory and runtime requirement}
+      
+     \textit{``The project was run on a 2024 48 GB MacBook Pro with an Apple M4 Pro (14 cores) with macOS Sequoia (Version 15.6). The approximate time to run this project is 17 hours, but it can be considerably longer if fewer cores are available. On a Linux cluster (4 cores, 60 GB RAM per core), the runtime was approximately 21.5 hours. Peak virtual memory usage was approximately 163 GB (driven by the Julia permutation test in \texttt{pairwiseFE/1\_pairwiseFEreg.jl}).''}
+
+      \end{frame}
+      
+      \begin{frame}{Basic requirements}
+      \framesubtitle{Background}%
+      
+      Most top journals in economics (and management) require a replication package (top 5s, most top field journals, Management Science, Marketing Science etc.)
+
+      \bigskip
+      
+      \textbf{Exceptions:} confidential administrative data, proprietary datasets; BUT you may still be required to show replication and you post the codes
+      
+      \bigskip
+      
+      \textbf{Details:} \url{https://aeadataeditor.github.io}
+      
+      \end{frame}
+
+
+
+
+% ================================================================
+\section{Repository Structure}
+% ================================================================
+
+% ----------------------------------------------------------------
+\begin{frame}{The ideal folder layout}
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+  \begin{block}{What you need}
+    \begin{itemize}
+      \item One \textbf{entry-point}: \code{code/make.sh}
+      \item An \textbf{output} folder that analysis scripts write into
+      \item A \textbf{writing} folder with its own \code{output/} sub-folder that LaTeX reads from
+      \item A sync script: \code{refresh\_output.sh}
+    \end{itemize}
+  \end{block}
+
+\column{0.48\textwidth}
+  \begin{exampleblock}{Folder tree}
+    \ttfamily\scriptsize
+    project/ \\
+    \quad code/ \\
+    \quad\quad \textbf{make.sh} \\
+    \quad\quad analysis/ \\
+    \quad\quad Scalars/ \\
+    \quad data/ \\
+    \quad dataLocal/ \\
+    \quad output/ \\
+    \quad writing/paper/ \\
+    \quad\quad \textbf{output/} \\
+    \quad\quad main.tex \\
+    \quad \textbf{refresh\_output.sh}
+  \end{exampleblock}
+\end{columns}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{One entry-point: \code{make.sh}}
+
+A reviewer (or your future self) should be able to run
+\textbf{one command} and reproduce the entire paper:
+
+\medskip
+
+\begin{lstlisting}[style=repocode, language=bash]
+#!/usr/bin/env bash
+set -euo pipefail        # stop on any error
+
+# -- Setup --------------------------------------------------
+mkdir -p ../output/logs ../dataLocal
+touch ../output/scalars.tex   # initialise scalar store
+
+# -- Analysis (in dependency order) -------------------------
+run_stata   analysis/summary_table.do
+python      analysis/main_regressions.py
+
+# -- Sync outputs to the writing folder --------------------
+bash ../refresh_output.sh
+
+# -- Compile paper ------------------------------------------
+cd ../writing/paper && pdflatex main.tex
+\end{lstlisting}
+
+\bigskip
+\textbf{Key idea:} every table, figure, and inline number is
+regenerated automatically before \LaTeX{} runs.
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{\code{refresh\_output.sh} — keeping writing in sync}
+
+After each run, \code{refresh\_output.sh} deletes stale copies
+in \code{writing/paper/output/} and replaces them with the
+fresh files from \code{output/}.
+Re-running \LaTeX{} then gives the up-to-date paper — \textbf{no
+manual copying}.
+
+\medskip
+
+\begin{lstlisting}[style=repocode, language=bash]
+SRC_DIR="output"
+DST_DIR="writing/paper/output"
+
+# Delete all non-tabonly files currently in writing/
+find "$DST_DIR" -type f ! -name '*_tabonly.tex' \
+  | xargs rm -f
+
+# Re-copy each from output/
+while IFS= read -r f; do
+    rel="${f#$DST_DIR/}"
+    cp "$SRC_DIR/$rel" "$f"
+done < <(find "$DST_DIR" -type f)
+\end{lstlisting}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}{Why the two-folder approach?}
+
+\begin{columns}[T]
+\column{0.48\textwidth}
+  \begin{alertblock}{Without it}
+    \begin{itemize}
+      \item Manual drag-and-drop after each run
+      \item Forget one table $\Rightarrow$ wrong numbers in paper
+      \item \code{writing/} and \code{output/} silently diverge
+      \item Replicator has no clear path from code to paper
+    \end{itemize}
+  \end{alertblock}
+
+\column{0.48\textwidth}
+  \begin{exampleblock}{With \code{refresh\_output.sh}}
+    \begin{itemize}
+      \item One command re-links every table and figure
+      \item Fully reproducible: \code{make.sh} $\to$ refresh $\to$ \code{pdflatex} $=$ whole paper
+      \item \LaTeX{} always reads the latest output
+      \item \code{writing/} can live on Overleaf or a separate git branch
+    \end{itemize}
+  \end{exampleblock}
+\end{columns}
+
+\end{frame}
+
+% ================================================================
+\section{The Scalars Pattern}
+% ================================================================
+
+% ----------------------------------------------------------------
+\begin{frame}{What are scalars?}
+
+Numbers that appear \textbf{inline in the text} of your paper:
+
+\medskip
+\begin{quote}
+  ``The cartel raised prices by \textbf{\textcolor{orange}{\textbackslash PriceEffect}}\%.''\\[4pt]
+  ``We observe \textbf{\textcolor{orange}{\textbackslash NSampleFirms}} firms
+    and \textbf{\textcolor{orange}{\textbackslash NTenders}} tenders.''
+\end{quote}
+
+\medskip
+If these are hard-coded, any data change forces manual updates
+across the paper — and errors creep in.
+
+\bigskip
+\begin{block}{The scalars pattern}
+Write every such number into \code{scalars.tex} as a \LaTeX{}
+\texttt{\textbackslash newcommand} — \textbf{automatically, from
+your analysis code}.
+\end{block}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{\code{scalars.tex} — what it looks like}
+
+\code{output/scalars.tex} accumulates \texttt{\textbackslash newcommand}
+definitions.  The comment records who wrote it and when.
+
+\medskip
+
+\begin{lstlisting}[style=repocode]
+% output/scalars.tex  (generated -- do not edit by hand)
+
+\newcommand{\NSampleFirms}{4217}
+  % written by jsmith running summary_table.do
+  %   on 3 Mar 2026 at 09:14
+
+\newcommand{\PriceEffect}{14.3}
+  % written by jsmith running costAnalysis.do
+  %   on 3 Mar 2026 at 11:02
+
+\newcommand{\ShareColluding}{.38}
+  % written by jsmith running varyingBehaviour.py
+  %   on 3 Mar 2026 at 14:55
+\end{lstlisting}
+
+\medskip
+In \code{main.tex} preamble: \quad
+\texttt{\textbackslash input\{output/scalars.tex\}}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{Writing scalars — Python}
+
+Import \code{scalar\_utils.py} from your \code{Scalars/} folder.
+Keys are auto-converted from \code{snake\_case} to \code{CamelCase}
+and digits to words (LaTeX macro names cannot contain digits).
+
+\medskip
+
+\begin{lstlisting}[style=repocode, language=Python]
+import sys; sys.path.append('code')
+from Scalars.scalar_utils import save_scalar
+
+fn = '../output/scalars.tex'
+
+# key becomes \NSampleFirms in LaTeX
+save_scalar('n_sample_firms',
+            df['firm_id'].nunique(), fn)
+
+# inline number from a regression
+save_scalar('price_effect',
+            round(coef * 100, 1), fn)
+
+# share_colluding -> \ShareColluding
+save_scalar('share_colluding',
+            g['colluded'].mean(), fn)
+\end{lstlisting}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{Writing scalars — Stata}
+
+Include \code{Scalars/scalar\_utils.do} at the top of your
+do-file.  Same \code{scalars.tex} file, shared across all
+languages.
+
+\medskip
+
+\begin{lstlisting}[style=repocode]
+do "code/Scalars/scalar_utils.do"
+
+local fn "../output/scalars.tex"
+
+* Save sample size
+count if !missing(price)
+save_scalar "NObservations" `r(N)' "`fn'"
+
+* Save a regression coefficient
+reghdfe ln_price cartel, absorb(tender_id)
+local coef = round(_b[cartel]*100, .1)
+save_scalar "PriceEffect" `coef' "`fn'"
+\end{lstlisting}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{Writing scalars — Julia}
+
+\code{scalar\_utils.jl} follows the same convention.
+
+\medskip
+
+\begin{lstlisting}[style=repocode, language=Julia]
+include("code/Scalars/scalar_utils.jl")
+
+fn = "../output/scalars.tex"
+
+# Save number of auction pairs
+save_scalar("NPairs", nrow(df), fn)
+
+# Coefficient with auto-generated key name
+# pairwise_fe_coef_one -> \PairwiseFeCoeOneOne
+save_scalar("pairwise_fe_coef_one",
+            coefs[1], fn)
+\end{lstlisting}
+
+\bigskip
+\textbf{Key point:} all three languages write to the \emph{same}
+\code{scalars.tex} — no duplication, no divergence.
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}[fragile]{Using scalars in the paper}
+
+Add one line to the \code{main.tex} preamble, then use any scalar
+as a macro anywhere in the text.
+
+\medskip
+
+\begin{lstlisting}[style=repocode, language=TeX]
+% preamble
+\input{output/scalars.tex}
+
+% body -- inline numbers, always up to date:
+We study \formatInt{\NSampleFirms} firms across
+\formatInt{\NTenders} procurement tenders.
+
+% results paragraph:
+Cartel participation raises the final price by
+\round{\PriceEffect}\% on average ($p < 0.01$).
+
+% table note referencing a scalar:
+The sample covers \NSampleFirms{} unique firms;
+\ShareColluding{} of tenders involve a colluding pair.
+\end{lstlisting}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}{Scalar best practices}
+
+\begin{block}{Golden rule}
+  \textbf{Never hard-code a number in your paper if your code knows it.}
+\end{block}
+
+\medskip
+
+\begin{itemize}
+  \item \textbf{Key naming:} CamelCase, no digits —
+        e.g.\ \code{NTwenty} not \code{N20}
+        (\LaTeX{} forbids digits in macro names)
+  \item \textbf{Audit trail:} comments in \code{scalars.tex} record
+        the timestamp and script name for every number
+  \item \textbf{Cross-language:} Python, Stata, and Julia all append
+        to the same file — no duplication
+  \item \textbf{Idempotent writes:} if a key already exists the old
+        line is replaced (\code{grep} + overwrite), so re-running is
+        safe
+  \item \textbf{Read back:} \code{scalar\_utils} also provides
+        \code{read\_scalar} so one script can consume what another
+        produced
+  \item \textbf{Timing:} run \code{refresh\_output.sh} \emph{after}
+        \code{make.sh} so \code{scalars.tex} lands in
+        \code{writing/paper/output/} before \LaTeX{} compiles
+\end{itemize}
+
+\end{frame}
+
+% ================================================================
+\section{End-to-End Workflow}
+% ================================================================
+
+% ----------------------------------------------------------------
+\begin{frame}{From raw data to published paper — one command}
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance = 0.55cm and 0.3cm,
+    box/.style = {
+      rectangle, rounded corners=3pt,
+      minimum width=1.85cm, minimum height=1.0cm,
+      align=center, font=\scriptsize\bfseries,
+      text=white
+    },
+    arr/.style = {-{Stealth[length=5pt]}, thick, gray!70},
+    note/.style = {font=\tiny, align=center, text=gray!80}
+  ]
+
+  \node[box, fill=red!70!black]   (make)    {\code{make.sh}\\entry-point};
+  \node[box, fill=blue!60!black,  right=of make]  (scripts) {Analysis\\scripts};
+  \node[box, fill=orange!70!black,right=of scripts](output)  {\code{output/}\\tables, figs\\scalars.tex};
+  \node[box, fill=teal!60!black,  right=of output] (refresh) {\code{refresh\_}\\output.sh};
+  \node[box, fill=red!70!black,   right=of refresh](latex)   {\code{pdflatex}\\main.tex};
+
+  \draw[arr] (make)    -- (scripts);
+  \draw[arr] (scripts) -- (output);
+  \draw[arr] (output)  -- (refresh);
+  \draw[arr] (refresh) -- (latex);
+
+  \node[note, below=0.25cm of make]    {sets env vars,\\creates folders};
+  \node[note, below=0.25cm of scripts] {Stata / Python\\/ Julia};
+  \node[note, below=0.25cm of output]  {auto-updated\\by each script};
+  \node[note, below=0.25cm of refresh] {copies files,\\creates \_tabonly};
+  \node[note, below=0.25cm of latex]   {\textbackslash input\{scalars\}\\+ \textbackslash includegraphics};
+
+\end{tikzpicture}
+\end{center}
+
+\bigskip
+
+\begin{exampleblock}{}
+  \centering
+  \code{bash code/make.sh} \quad$\Rightarrow$\quad
+  updated, compiled paper. \textbf{No manual steps.}
+\end{exampleblock}
+
+\end{frame}
+
+% ----------------------------------------------------------------
+\begin{frame}{Replication package checklist}
+
+\textbf{Before submission:}
+
+\begin{itemize}
+  \item[\checkmark] Single entry-point: \code{bash code/make.sh} reproduces everything
+  \item[\checkmark] \code{refresh\_output.sh} keeps \code{writing/paper/output/} in sync
+  \item[\checkmark] All inline numbers written via \code{save\_scalar} — zero hard-coded values in the text
+  \item[\checkmark] \code{scalars.tex} is \texttt{\textbackslash input\{\}}-ed in \code{main.tex} preamble
+  \item[\checkmark] README: folder structure, output list per script, runtime \& memory
+  \item[\checkmark] Config file for paths (\code{config.py} or \code{profile.do}) — no absolute paths in scripts
+  \item[\checkmark] Environment pinned: \code{conda .yml}, \code{requirements.txt}, or Stata package list with versions
+  \item[\checkmark] Log files saved per script to \code{output/logs/}
+  \item[\checkmark] Tested on a clean environment before submission
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Random issues to take care of}
+\end{frame}
+
+\end{document}
