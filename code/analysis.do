@@ -8,8 +8,8 @@ sum price_weight
 
 local wonderfulConstant = r(mean)
 
-save_scalar "\wonderfulConstant" ///
-    "`\wonderfulConstant'"                      ///
+save_scalar "wonderfulConstant" ///
+    "`wonderfulConstant'"                      ///
     "$WONDERFUL_PROJECT_PATH/output/scalars.tex"
 
 estpost tabstat tender_estimated_price, stat(n mean sd min max) col(stat)

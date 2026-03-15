@@ -114,7 +114,7 @@
       
        \begin{frame}{How To Solve This?}
        		\begin{itemize}
-			\item From the beginning, use Git.
+			\item From the beginning, use Git (VITA SHOWS).
 			\item Set the repository well (see later).
 			\item Automate everything possible and have it ready like you were submitting a replication package tomorrow.
 			\item Replicate everything and test whether it works (ideally let co-authors do that).
@@ -159,10 +159,11 @@
     \quad code/ \\
     \quad\quad \textbf{make.sh} \\
     \quad\quad analysis/ \\
-    \quad\quad Scalars/ \\
+    \quad\quad scalars/ \\
     \quad data/ \\
     \quad dataLocal/ \\
     \quad output/ \\
+    \quad\quad logs/ \\
     \quad writing/paper/ \\
     \quad\quad \textbf{output/} \\
     \quad\quad main.tex \\
@@ -181,55 +182,22 @@ A reviewer (or your future self) should be able to run
 \medskip
 
 \begin{lstlisting}[style=repocode, language=bash]
-#!/usr/bin/env bash
-set -euo pipefail        # stop on any error
-
-# -- Setup --------------------------------------------------
-mkdir -p ../output/logs ../dataLocal
-touch ../output/scalars.tex   # initialise scalar store
-
-# -- Analysis (in dependency order) -------------------------
-run_stata   analysis/summary_table.do
-python      analysis/main_regressions.py
+# -- Rerunning the project -------------------------
+cd code
+./main.sh
 
 # -- Sync outputs to the writing folder --------------------
-bash ../refresh_output.sh
+cd ..
+../refresh_output.sh
 
 # -- Compile paper ------------------------------------------
 cd ../writing/paper && pdflatex main.tex
 \end{lstlisting}
+(VITA RUNS)
 
 \bigskip
 \textbf{Key idea:} every table, figure, and inline number is
 regenerated automatically before \LaTeX{} runs.
-
-\end{frame}
-
-% ----------------------------------------------------------------
-\begin{frame}[fragile]{\code{refresh\_output.sh} — keeping writing in sync}
-
-After each run, \code{refresh\_output.sh} deletes stale copies
-in \code{writing/paper/output/} and replaces them with the
-fresh files from \code{output/}.
-Re-running \LaTeX{} then gives the up-to-date paper — \textbf{no
-manual copying}.
-
-\medskip
-
-\begin{lstlisting}[style=repocode, language=bash]
-SRC_DIR="output"
-DST_DIR="writing/paper/output"
-
-# Delete all non-tabonly files currently in writing/
-find "$DST_DIR" -type f ! -name '*_tabonly.tex' \
-  | xargs rm -f
-
-# Re-copy each from output/
-while IFS= read -r f; do
-    rel="${f#$DST_DIR/}"
-    cp "$SRC_DIR/$rel" "$f"
-done < <(find "$DST_DIR" -type f)
-\end{lstlisting}
 
 \end{frame}
 
@@ -290,172 +258,17 @@ your analysis code}.
 \end{frame}
 
 % ----------------------------------------------------------------
-\begin{frame}[fragile]{\code{scalars.tex} — what it looks like}
-
-\code{output/scalars.tex} accumulates \texttt{\textbackslash newcommand}
-definitions.  The comment records who wrote it and when.
-
-\medskip
-
-\begin{lstlisting}[style=repocode]
-% output/scalars.tex  (generated -- do not edit by hand)
-
-\newcommand{\NSampleFirms}{4217}
-  % written by jsmith running summary_table.do
-  %   on 3 Mar 2026 at 09:14
-
-\newcommand{\PriceEffect}{14.3}
-  % written by jsmith running costAnalysis.do
-  %   on 3 Mar 2026 at 11:02
-
-\newcommand{\ShareColluding}{.38}
-  % written by jsmith running varyingBehaviour.py
-  %   on 3 Mar 2026 at 14:55
-\end{lstlisting}
-
-\medskip
-In \code{main.tex} preamble: \quad
-\texttt{\textbackslash input\{output/scalars.tex\}}
-
-\end{frame}
-
-% ----------------------------------------------------------------
-\begin{frame}[fragile]{Writing scalars — Python}
-
-Import \code{scalar\_utils.py} from your \code{Scalars/} folder.
-Keys are auto-converted from \code{snake\_case} to \code{CamelCase}
-and digits to words (LaTeX macro names cannot contain digits).
-
-\medskip
-
-\begin{lstlisting}[style=repocode, language=Python]
-import sys; sys.path.append('code')
-from Scalars.scalar_utils import save_scalar
-
-fn = '../output/scalars.tex'
-
-# key becomes \NSampleFirms in LaTeX
-save_scalar('n_sample_firms',
-            df['firm_id'].nunique(), fn)
-
-# inline number from a regression
-save_scalar('price_effect',
-            round(coef * 100, 1), fn)
-
-# share_colluding -> \ShareColluding
-save_scalar('share_colluding',
-            g['colluded'].mean(), fn)
-\end{lstlisting}
-
-\end{frame}
-
-% ----------------------------------------------------------------
-\begin{frame}[fragile]{Writing scalars — Stata}
-
-Include \code{Scalars/scalar\_utils.do} at the top of your
-do-file.  Same \code{scalars.tex} file, shared across all
-languages.
-
-\medskip
-
-\begin{lstlisting}[style=repocode]
-do "code/Scalars/scalar_utils.do"
-
-local fn "../output/scalars.tex"
-
-* Save sample size
-count if !missing(price)
-save_scalar "NObservations" `r(N)' "`fn'"
-
-* Save a regression coefficient
-reghdfe ln_price cartel, absorb(tender_id)
-local coef = round(_b[cartel]*100, .1)
-save_scalar "PriceEffect" `coef' "`fn'"
-\end{lstlisting}
-
-\end{frame}
-
-% ----------------------------------------------------------------
-\begin{frame}[fragile]{Writing scalars — Julia}
-
-\code{scalar\_utils.jl} follows the same convention.
-
-\medskip
-
-\begin{lstlisting}[style=repocode, language=Julia]
-include("code/Scalars/scalar_utils.jl")
-
-fn = "../output/scalars.tex"
-
-# Save number of auction pairs
-save_scalar("NPairs", nrow(df), fn)
-
-# Coefficient with auto-generated key name
-# pairwise_fe_coef_one -> \PairwiseFeCoeOneOne
-save_scalar("pairwise_fe_coef_one",
-            coefs[1], fn)
-\end{lstlisting}
-
-\bigskip
-\textbf{Key point:} all three languages write to the \emph{same}
-\code{scalars.tex} — no duplication, no divergence.
-
-\end{frame}
-
-% ----------------------------------------------------------------
-\begin{frame}[fragile]{Using scalars in the paper}
-
-Add one line to the \code{main.tex} preamble, then use any scalar
-as a macro anywhere in the text.
-
-\medskip
-
-\begin{lstlisting}[style=repocode, language=TeX]
-% preamble
-\input{output/scalars.tex}
-
-% body -- inline numbers, always up to date:
-We study \formatInt{\NSampleFirms} firms across
-\formatInt{\NTenders} procurement tenders.
-
-% results paragraph:
-Cartel participation raises the final price by
-\round{\PriceEffect}\% on average ($p < 0.01$).
-
-% table note referencing a scalar:
-The sample covers \NSampleFirms{} unique firms;
-\ShareColluding{} of tenders involve a colluding pair.
-\end{lstlisting}
-
-\end{frame}
-
-% ----------------------------------------------------------------
 \begin{frame}{Scalar best practices}
 
 \begin{block}{Golden rule}
   \textbf{Never hard-code a number in your paper if your code knows it.}
+  
+
+
 \end{block}
-
-\medskip
-
-\begin{itemize}
-  \item \textbf{Key naming:} CamelCase, no digits —
-        e.g.\ \code{NTwenty} not \code{N20}
-        (\LaTeX{} forbids digits in macro names)
-  \item \textbf{Audit trail:} comments in \code{scalars.tex} record
-        the timestamp and script name for every number
-  \item \textbf{Cross-language:} Python, Stata, and Julia all append
-        to the same file — no duplication
-  \item \textbf{Idempotent writes:} if a key already exists the old
-        line is replaced (\code{grep} + overwrite), so re-running is
-        safe
-  \item \textbf{Read back:} \code{scalar\_utils} also provides
-        \code{read\_scalar} so one script can consume what another
-        produced
-  \item \textbf{Timing:} run \code{refresh\_output.sh} \emph{after}
-        \code{make.sh} so \code{scalars.tex} lands in
-        \code{writing/paper/output/} before \LaTeX{} compiles
-\end{itemize}
+ \bigskip
+ 
+ (VITA SHOWS)
 
 \end{frame}
 
@@ -509,29 +322,17 @@ The sample covers \NSampleFirms{} unique firms;
 
 \end{frame}
 
-% ----------------------------------------------------------------
-\begin{frame}{Replication package checklist}
-
-\textbf{Before submission:}
-
-\begin{itemize}
-  \item[\checkmark] Single entry-point: \code{bash code/make.sh} reproduces everything
-  \item[\checkmark] \code{refresh\_output.sh} keeps \code{writing/paper/output/} in sync
-  \item[\checkmark] All inline numbers written via \code{save\_scalar} — zero hard-coded values in the text
-  \item[\checkmark] \code{scalars.tex} is \texttt{\textbackslash input\{\}}-ed in \code{main.tex} preamble
-  \item[\checkmark] README: folder structure, output list per script, runtime \& memory
-  \item[\checkmark] Config file for paths (\code{config.py} or \code{profile.do}) — no absolute paths in scripts
-  \item[\checkmark] Environment pinned: \code{conda .yml}, \code{requirements.txt}, or Stata package list with versions
-  \item[\checkmark] Log files saved per script to \code{output/logs/}
-  \item[\checkmark] Tested on a clean environment before submission
-\end{itemize}
-
-\end{frame}
 
 \begin{frame}{Random issues to take care of}
-You need to set seeds
-Have logs
-Draftable (make example) -- \url{https://www.draftable.com/compare}
+
+\begin{itemize}
+\item No absolute path (use config.py or profile.do (VITA SHOWS)
+\item You need to set seeds
+\item Have logs
+\item Draftable (make example) -- \url{https://www.draftable.com/compare} (VITA SHOWS)
+\end{itemize}
+
+
 
 \end{frame}
 
