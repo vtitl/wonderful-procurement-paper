@@ -18,7 +18,7 @@
 \usepackage{booktabs}  % Tables
 \usepackage{tabularx}
 \usepackage{tikz}      % Diagrams
-\usetikzlibrary{calc, shapes, backgrounds, arrows.meta}
+\usetikzlibrary{calc, shapes, backgrounds, arrows.meta, positioning}
 \usepackage{amsmath, amssymb}
 \usepackage{url}       % `\url`s
 \usepackage{listings}  % Code listings
@@ -55,7 +55,6 @@
 \newcommand{\code}[1]{\texttt{\small#1}}
 
 
-\frenchspacing
 \begin{document}
   \frame{\maketitle}
 
@@ -66,20 +65,23 @@
     \end{frame}}
     
     
+
+
+    \section{Background}
     \begin{frame}{What I Saw and/or Did in the Past}
     	\begin{itemize}
-		\item Created v12, v13, _final, and then dates and similar
+		\item Created v12, v13, \_final, and then dates and similar
 		\item Copy pasting and manually adjusting tables (e.g., from outreg2)
 		\item Copy pasting findings -- particular numbers -- from tables
     		\item No comments, no documentation of which file produces what
     	\end{itemize}		
 	
+	\bigskip
+	
 	This is easy at first, but gets costly when you need to make adjustment to the code (after getting comments from reviewers) or even worse when you need to submit a replication package.
     \end{frame}
 
-    \section{Background}
-
-    \begin{frame}{Background}
+    \begin{frame}{Policies of Journals}
       \framesubtitle{Background}%
       
       Most top journals in economics (and management) require a replication package (top 5s, most top field journals, Management Science, Marketing Science etc.)
@@ -110,40 +112,24 @@
 	\end{itemize}      
       \end{frame}
       
-       \begin{frame}{Example config file}
-      \framesubtitle{Background}%
+       \begin{frame}{How To Solve This?}
+       		\begin{itemize}
+			\item From the beginning, use Git.
+			\item Set the repository well (see later).
+			\item Automate everything possible and have it ready like you were submitting a replication package tomorrow.
+			\item Replicate everything and test whether it works (ideally let co-authors do that).
+		\end{itemize}
+       \end{frame}
+           
+%      It can by config.py with paths needed to run script. For Stata, I recommend to use profile.do, I suggest sth like this:
+%      \textbf{Details:} \url{https://www.stata.com/support/faqs/programming/profile-do-file/}
+%         \end{frame}
       
-      It can by config.py with paths needed to run script. For Stata, I recommend to use profile.do, I suggest sth like this:
-      
+%      \begin{frame}{Example memory and runtime requirement}
+%     \textit{``The project was run on a 2024 48 GB MacBook Pro with an Apple M4 Pro (14 cores) with macOS Sequoia (Version 15.6). The approximate time to run this project is 17 hours, but it can be considerably longer if fewer cores are available. On a Linux cluster (4 cores, 60 GB RAM per core), the runtime was approximately 21.5 hours. Peak virtual memory usage was approximately 163 GB (driven by the Julia permutation test in \texttt{pairwiseFE/1\_pairwiseFEreg.jl}).''}
+%   \end{frame}
       
 
-      \bigskip
-      
-      \textbf{Details:} \url{https://www.stata.com/support/faqs/programming/profile-do-file/}
-      
-      \end{frame}
-
-      
-      \begin{frame}{Example memory and runtime requirement}
-      
-     \textit{``The project was run on a 2024 48 GB MacBook Pro with an Apple M4 Pro (14 cores) with macOS Sequoia (Version 15.6). The approximate time to run this project is 17 hours, but it can be considerably longer if fewer cores are available. On a Linux cluster (4 cores, 60 GB RAM per core), the runtime was approximately 21.5 hours. Peak virtual memory usage was approximately 163 GB (driven by the Julia permutation test in \texttt{pairwiseFE/1\_pairwiseFEreg.jl}).''}
-
-      \end{frame}
-      
-      \begin{frame}{Basic requirements}
-      \framesubtitle{Background}%
-      
-      Most top journals in economics (and management) require a replication package (top 5s, most top field journals, Management Science, Marketing Science etc.)
-
-      \bigskip
-      
-      \textbf{Exceptions:} confidential administrative data, proprietary datasets; BUT you may still be required to show replication and you post the codes
-      
-      \bigskip
-      
-      \textbf{Details:} \url{https://aeadataeditor.github.io}
-      
-      \end{frame}
 
 
 
@@ -543,6 +529,10 @@ The sample covers \NSampleFirms{} unique firms;
 \end{frame}
 
 \begin{frame}{Random issues to take care of}
+You need to set seeds
+Have logs
+Draftable (make example) -- \url{https://www.draftable.com/compare}
+
 \end{frame}
 
 \end{document}
