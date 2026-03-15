@@ -1,0 +1,113 @@
+\documentclass[12pt,american]{scrartcl}
+
+\usepackage{babel}
+\usepackage[babel]{microtype}
+\usepackage[babel]{csquotes}
+
+\usepackage[journal={AEJ:Applied},
+			manuscript={AEJApp-...},
+			editor={Nicholas Ryan}]{reviewresponse}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+%\usepackage{newcent}
+%\usepackage[scaled]{beramono}
+
+\usepackage{booktabs}
+\usepackage{ragged2e}
+\usepackage{pdflscape}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{amsmath} % Math fonts
+\usepackage{amsfonts} %s
+\usepackage{amssymb} %
+\usepackage{float}
+\usepackage{natbib}
+\setcitestyle{authoryear,open={(},close={)}}
+\usepackage[flushleft]{threeparttable}
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommand{\todolm}[1]{\todo[color=red!40]{#1}}
+\usepackage{xr}
+
+\newcommand{\round}[1]{%      
+  \pgfmathparse{#1}%
+  \pgfmathprintnumber[fixed,fixed zerofill,precision=2]{\pgfmathresult}%
+}
+
+\newcommand{\B}{\multicolumn{1}{c}{}}
+
+\newcommand{\formatInt}[1]{%
+  % switch into the /pgf/number format key family
+  \pgfkeys{/pgf/number format/.cd,
+    fixed,            % use fixed (not scientific) format
+    precision=0,      % no digits after the decimal point
+    1000 sep={,}      % comma for the thousands separator
+  }%
+  \pgfmathprintnumber{#1}%
+}
+\newcommand{\printpvalue}[1]{
+  \ifdim #1pt < 0.001pt
+    p < 0.001%
+  \else
+    p = #1%
+  \fi
+}
+
+\newcommand{\roundfour}[1]{%
+   \pgfmathparse{#1}%
+   \pgfmathprintnumber[fixed,precision=4]{\pgfmathresult}%
+ }
+
+
+\input{../output/scalars.tex}
+
+\externaldocument{../paper/main}
+
+\usepackage{clipboard}
+\openclipboard{../paper/clipboardForResponses}
+
+
+
+
+\renewcommand\thefigure{R\arabic{figure}}
+\renewcommand\thetable{R\arabic{table}}
+\renewcommand*{\thepage}{R-\arabic{page}}
+
+%\usepackage[backend=biber,style=ieee,dashed=false,url=false,isbn=false,defernumbers=true,refsection=section]{biblatex}
+%\bibliography{literature.bib}
+
+\usepackage{hyperref}
+\usepackage{adjustbox}
+
+\setlength{\parindent}{15pt}
+\setlength{\parskip}{0pt}
+
+
+\title{Title}
+\author{Bruno Baranek \and Leon Musolff \and Vitezslav Titl}
+
+\date{\today}
+
+\begin{document}
+
+
+%\listoftodos
+
+\newpage
+% Cover Letter
+\input{cover_letter.tex}
+
+
+\editor
+\input{editorMain.tex}
+
+\reviewer
+\input{reviewer1.tex}
+
+
+%\newpage
+%\bibliographystyle{apalike}
+%\bibliography{../paper/references.bib}
+
+
+\end{document}

@@ -16,6 +16,8 @@
 \usepackage{natbib}
 \usepackage{ragged2e}
 \usepackage{pgfmath}   % for \round and \formatInt helpers below
+ \usepackage{clipboard}
+ \newclipboard{clipboardForResponses}
 
 % ── Number-formatting helpers (same as in the real paper) ───────────────────
 \newcommand{\round}[1]{%
@@ -88,7 +90,8 @@ Table~\ref{tab:summary} reports summary statistics.
 \section{Results}
 \label{sec:results}
 
-Here is a new paragraph that demonstrates how not copy paste to the answer to reviewers, but have it automatized.
+\label{highlightedResultInPaperPage}
+\Copy{highlightedResultInPaper}{Here is a new paragraph that demonstrates how not copy paste to the answer to reviewers, but have it automatized}.
 
 % ════════════════════════════════════════════════════════════════════════════
 \section{Conclusion}
