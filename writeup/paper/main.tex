@@ -89,7 +89,30 @@ Table~\ref{tab:summary} reports summary statistics.
 % ════════════════════════════════════════════════════════════════════════════
 \section{Results}
 \label{sec:results}
+\subsection{Parallel Trends Validation}
+\label{sec:pretrends}
+Before turning to the treatment effect estimates, we examine whether 
+treated and not-yet-treated municipalities followed similar emission 
+trajectories prior to threshold crossing. Panel A of Table 
+\ref{tab:dynamic} and Figure \ref{fig:co2pl_lev5_10} report pre-treatment 
+coefficients from the event study specification over the window 
+$T_{-5}$ to $T_{+5}$.
 
+The pre-treatment coefficients are small and close to zero throughout, 
+with point estimates ranging from $-0.000109$ to $-0.000268$. All 
+four periods from $T_{-5}$ through $T_{-2}$ are clearly insignificant 
+($p > 0.37$). The coefficient at $T_{-1}$ is $-0.000268$ 
+(SE $= 0.000153$, $p = 0.080$). While marginally 
+significant in isolation, the joint test of all five pre-treatment coefficients  yields $\chi^2(5) = 3.80$ ($p = 0.579$), and the 
+average pre-treatment coefficient is $-0.000177$ 
+(SE $= 0.000109$, $p = 0.104$). Both confirm that 
+this pattern reflects sampling variation rather than a systematic 
+pre-existing differential trend. Moreover, the 
+magnitude is small --- less than one sixth of the 
+average post-treatment effect --- providing no 
+economically meaningful evidence of pre-treatment 
+divergence. We therefore proceed on the basis that 
+the conditional parallel trends assumption holds.
 \label{highlightedResultInPaperPage}
 \Copy{highlightedResultInPaper}{Here is a new paragraph that demonstrates how not copy paste to the answer to reviewers, but I have it automatted}.
 
